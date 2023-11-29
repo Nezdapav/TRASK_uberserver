@@ -1,0 +1,12 @@
+version: '2'
+services:
+  clusterf-proxy:
+    image: andymacdonald/clusterf-chaos-proxy
+    environment:
+      JAVA_OPTS: "-Dchaos.strategy=RANDOM_HAVOC -Ddestination.hostProtocolAndPort=http://database:3100 -Dchaos.strategy.delayResponse.random.maxSeconds=10"
+    ports:
+      - "8088:8080"
+  database:
+    image: mitchallen/random-server
+    expose:
+    - 3100
