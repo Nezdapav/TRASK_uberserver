@@ -1,23 +1,34 @@
-from urllib.parse import urljoin
-import aiohttp as aiohttp
+import json
+from http import client
 
-from uberserver_src.models.models import CurrentPositionResponse
+from uberserver_src.errors.gps_server_client_errors import (
+    UberServerVIPNotFound,
+    UberServerUnexpectedStatus,
+    UberServerTimeOut,
+)
+from uberserver_src.models.models import VIPGPSCoordsResponse
 
 
 class GPSServerClient:
     def __init__(self):
-        self.address = "localhost:8088/v1/"
-        self.timeout = aiohttp.ClientTimeout(total=1)
+        self.address = "localhost"
+        self.timeout_sec = 4.5
 
-    def _get(self, path: str):
-        with aiohttp.ClientSession(timeout=self.timeout) as session:
-            with session.get(urljoin(self.address, path)) as resp:
-                if resp.status == 200:
-                    print(200)
-                else:
-                    print(500)
-                return resp.json()
+    def _get(self, url):
+        connection = client.HTTPConnection(self.address, 8088, timeout=self.timeout_sec)
+        try:
+            connection.request("GET", url, headers={"Host": self.address})
+            response = connection.getresponse()
+        except TimeoutError:
+            raise UberServerTimeOut()
+        if response.status == 200:
+            response_data = json.loads(response.read().decode("utf-8"))
+            return response_data
+        if response.status == 404:
+            raise UberServerVIPNotFound()
+        else:
+            raise UberServerUnexpectedStatus(f"Unexpected status code {response.status}.")
 
-    def vip_position(self, point_in_time: int) -> CurrentPositionResponse:
-        response = self._get(f"coord/{point_in_time}")
-        return CurrentPositionResponse.model_validate_json(response)
+    def vip_position(self, point_in_time: int) -> VIPGPSCoordsResponse:
+        response = self._get(f"/v1/coords/{point_in_time}")
+        return VIPGPSCoordsResponse.parse_obj(response)
