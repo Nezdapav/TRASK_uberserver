@@ -2,20 +2,17 @@ import json
 from http import client
 
 from uberserver_src.errors.gps_server_client_errors import (
-    UberServerVIPNotFound,
-    UberServerUnexpectedStatus,
-    UberServerTimeOut,
-)
+    UberServerTimeOut, UberServerUnexpectedStatus, UberServerVIPNotFound)
 from uberserver_src.models.models import VIPGPSCoordsResponse
 
 
 class GPSServerClient:
     def __init__(self):
-        self.address = "localhost"
+        self.address = "clusterf-proxy"
         self.timeout_sec = 4.5
 
     def _get(self, url):
-        connection = client.HTTPConnection(self.address, 8088, timeout=self.timeout_sec)
+        connection = client.HTTPConnection(self.address, 8080, timeout=self.timeout_sec)
         try:
             connection.request("GET", url, headers={"Host": self.address})
             response = connection.getresponse()

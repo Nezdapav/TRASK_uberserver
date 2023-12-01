@@ -1,6 +1,7 @@
+from datetime import datetime
+
 from humps import camel
 from pydantic import BaseModel, Field
-from datetime import datetime
 
 
 def to_camel(string: str) -> str:
@@ -9,7 +10,7 @@ def to_camel(string: str) -> str:
 
 class CamelBaseModel(BaseModel):
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
         alias_generator = to_camel
 
 

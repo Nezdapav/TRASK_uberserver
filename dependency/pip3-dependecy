@@ -2,3 +2,6 @@ fastapi
 pytz
 pydantic
 humps
+uvicorn
+prometheus-client
+prometheus_fastapi_instrumentator

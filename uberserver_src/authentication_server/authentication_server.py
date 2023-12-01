@@ -1,9 +1,10 @@
 from typing import Callable
 
 from fastapi import Depends
-from fastapi.security import HTTPBasicCredentials, HTTPBasic
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
-from uberserver_src.errors.authentication_errors import BadCredentials, ForbiddenUser
+from uberserver_src.errors.authentication_errors import (BadCredentials,
+                                                         ForbiddenUser)
 
 basic_auth = HTTPBasic()
 
